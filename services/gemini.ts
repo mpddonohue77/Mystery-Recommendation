@@ -1,9 +1,9 @@
-
 import { GoogleGenAI, Type } from "@google/genai";
 import { Book, SearchMode } from "../types";
 import { STANDARD_INSTRUCTION, DEEP_CUTS_INSTRUCTION } from "../constants";
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || '' });
+// The API key is injected by Vite during the build process
+const ai = new GoogleGenAI({ apiKey: process.env.API_KEY as string });
 
 export const generateCover = async (book: Book): Promise<string | null> => {
   try {
@@ -35,10 +35,9 @@ export const generateCover = async (book: Book): Promise<string | null> => {
 
 export const getRecommendations = async (query: string, excludedTitles: string[] = [], mode: SearchMode = 'standard'): Promise<Book[]> => {
   const instruction = mode === 'deep-cuts' ? DEEP_CUTS_INSTRUCTION : STANDARD_INSTRUCTION;
-  // Use Pro for complex 'Deep Cuts' reasoning and Flash for fast/cheap 'Essentials'
   const modelName = mode === 'deep-cuts' ? 'gemini-3-pro-preview' : 'gemini-3-flash-preview';
   
-  const model = ai.models.generateContent({
+  const response = await ai.models.generateContent({
     model: modelName,
     contents: `SEARCH PARAMETER: "${query}"
     
@@ -73,16 +72,14 @@ export const getRecommendations = async (query: string, excludedTitles: string[]
     },
   });
 
-  const response = await model;
   const text = response.text;
-  
   if (!text) return [];
   
   try {
     const data = JSON.parse(text);
     return data.map((b: any) => ({
         ...b,
-        id: b.id || Math.random().toString(36).substr(2, 9)
+        id: b.id || Math.random().toString(36).substring(2, 11)
     }));
   } catch (error) {
     console.error("Failed to parse Gemini response:", error);
