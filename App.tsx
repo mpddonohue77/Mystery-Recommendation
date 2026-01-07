@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { getRecommendations } from './services/gemini';
 import { Book, UserBook, BookStatus, QuickPick, SearchMode } from './types';
-import { QUICK_PICKS } from './constants.tsx';
+import { QUICK_PICKS } from './constants';
 import BookCard from './components/BookCard';
 import InvestigationLoader from './components/InvestigationLoader';
 import SavedListDrawer from './components/SavedListDrawer';
